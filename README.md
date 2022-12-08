@@ -1,2 +1,2 @@
 # ChooseYourPet
-Tool for choosing the right pet for you using analytical hierarchy process.
+Tool for choosing the right pet for you, using analytical hierarchy process.
