@@ -1,12 +1,10 @@
-# Choose ypur pet
+# Choose your pet
 
 ## Tool for choosing the right pet for you using analytical hierarchy process
 
----
-
 ### **How to setup for development**
 
-- Make sure you have `python3` and `pip` installed
+- Make sure you have `python3`, `pip` and `npm` installed
 - Create and activate virtual environment with [venv](https://docs.python.org/3/library/venv.html) (and do everything else inside created environment)
 - Install dependencies
 
