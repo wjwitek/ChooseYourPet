@@ -1,18 +1,23 @@
-from flask import Flask
+import os
+from flask import Flask, send_from_directory
 from utils.data import get_criteria_info, get_pet_data
 
 criteria = get_criteria_info("./data/categories.csv")
 pet_data = get_pet_data("./data/pet_data.csv", [i["name"] for i in criteria])
 # TODO: criteria matrices from pet_data
 
-app = Flask(__name__, static_folder="./assets/build", static_url_path="/")
+app = Flask(__name__, static_folder="./assets/build")
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<string:path>")
-@app.route("/<path:path>")
-def get_index(path):
-    return app.send_static_file("index.html")
+# Hacky way to make Flask catch all the routes and not try to serve static files
+# See https://github.com/pallets/flask/issues/1633
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def index(path):
+    if path != "" and os.path.exists(app.static_folder + '/' + path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
-@app.route("/resources/criteria")
-def get_criteria():
+@app.route("/api/criteria")
+def criteria():
     return {"criteria": criteria}
