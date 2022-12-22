@@ -7,8 +7,10 @@ pet_data = get_pet_data("./data/pet_data.csv", [i["name"] for i in criteria])
 
 app = Flask(__name__, static_folder="./assets/build", static_url_path="/")
 
-@app.route("/")
-def get_index():
+@app.route("/", defaults={"path": ""})
+@app.route("/<string:path>")
+@app.route("/<path:path>")
+def get_index(path):
     return app.send_static_file("index.html")
 
 @app.route("/resources/criteria")
