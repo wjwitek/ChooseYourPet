@@ -36,14 +36,14 @@ def api_compute():
     if False:
         return "Invalid json structure", 400
 
-    if len(buffer) == MAX_RESULTS_SIZE:
+    if len(buffer) == MAX_BUFFER_SIZE:
         # Remove oldest element from the buffer
         buffer.pop(next(iter(buffer)))
     
     key = uuid.uuid4()
     buffer[key] = {"data": data, "result": None}
 
-    return jsonify(), 201, {"location": f"/api/results/{key}"}
+    return jsonify(), 201, {"location": f"/results/{key}"}
 
 @app.route("/api/results/<uuid:key>")
 def api_result(key):

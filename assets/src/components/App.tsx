@@ -14,7 +14,7 @@ const App = () => {
         <Routes>
           <Route path="/" element={<Welcome />} />
           <Route path="/compare" element={<Compare />} />
-          <Route path="/result/:uuid" element={<Result />} />
+          <Route path="/results/:uuid" element={<Result />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>

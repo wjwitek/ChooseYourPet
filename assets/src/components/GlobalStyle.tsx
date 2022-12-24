@@ -7,9 +7,9 @@ const GlobalStyle = createGlobalStyle`
     height: 100vh;
     overflow: hidden;
     font-size: 10px;
-    font-family: Roboto, sans-serif;
+    font-family: ${(props) => props.theme.mainFont}, sans-serif;
     background-image: url(${(props) => props.theme.backgroundImage});
-    background-color: ${(props) => props.theme.colors.backgroundMain};
+    background-color: #FFFFFF;
   }
 `;
 
