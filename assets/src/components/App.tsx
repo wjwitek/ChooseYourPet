@@ -1,9 +1,10 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import GlobalStyle from "./GlobalStyle";
-import Compare from "./Compare";
+import CompareCriteria from "./CompareCriteria";
+import ComparePets from "./ComparePets";
 import Result from "./Result";
-import Welcome from "./Welcome";
+import Home from "./Home";
 import theme from "../theme";
 
 const App = () => {
@@ -12,10 +13,11 @@ const App = () => {
       <GlobalStyle />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Welcome />} />
-          <Route path="/compare" element={<Compare />} />
-          <Route path="/results/:uuid" element={<Result />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/compare/criteria" element={<CompareCriteria />} />
+          <Route path="/compare/pets" element={<ComparePets />} />
+          <Route path="/result" element={<Result />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </BrowserRouter>
     </ThemeProvider>

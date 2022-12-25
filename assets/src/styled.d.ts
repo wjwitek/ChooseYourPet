@@ -11,6 +11,7 @@ declare module "styled-components" {
       bgDark: string;
       bgLight: string;
       accent: string;
+      disabled: string;
     };
   }
 }

@@ -1,15 +1,13 @@
 from flask import Flask, send_from_directory, request, jsonify
-from utils.data import get_criteria_info, get_pet_data
-import uuid
+from utils.data import get_criteria, get_pets
 import os
 
-MAX_BUFFER_SIZE = 20
+criteria = None
+pets = None
+result = None
 
-buffer = {}
-
-criteria = get_criteria_info("./data/categories.csv")
-pet_data = get_pet_data("./data/pet_data.csv", [i["name"] for i in criteria])
-# TODO: criteria matrices from pet_data
+criteria_data = get_criteria("./data/categories.csv")
+pets_data = get_pets("./data/pets.csv")
 
 app = Flask(__name__, static_folder="./assets/build")
 
@@ -23,37 +21,58 @@ def index(path):
     else:
         return send_from_directory(app.static_folder, "index.html")
 
-@app.route("/api/criteria")
+@app.route("/api/data/criteria")
 def api_criteria():
-    return {"criteria": criteria}
+    return {"data": criteria_data}
 
-@app.route("/api/compute", methods=["POST"])
-def api_compute():
+@app.route("/api/data/pets")
+def api_pets():
+    return {"data": pets_data}
+
+@app.route("/api/available")
+def api_available():
+    return {
+        "criteria": criteria is not None,
+        "pets": pets is not None,
+    }
+
+@app.route("/api/submit/criteria", methods=["POST"])
+def api_submit_criteria():
+    global criteria
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
+    print(data)
 
     # TODO: data validation
     if False:
         return "Invalid json structure", 400
-
-    if len(buffer) == MAX_BUFFER_SIZE:
-        # Remove oldest element from the buffer
-        buffer.pop(next(iter(buffer)))
     
-    key = uuid.uuid4()
-    buffer[key] = {"data": data, "result": None}
+    criteria = data
+    result = None
 
-    return jsonify(), 201, {"location": f"/results/{key}"}
+    return jsonify(), 200
 
-@app.route("/api/results/<uuid:key>")
+@app.route("/api/submit/pets", methods=["POST"])
+def api_submit_pets():
+    global pets
+    # Raises 400 error if th request body is not a valid json
+    data = request.get_json()
+    try:
+        
+
+    # TODO: data validation
+    if False:
+        return "Invalid json structure", 400
+    
+    pets = data
+    result = None
+
+    return jsonify(), 200
+
+@app.route("/api/result")
 def api_result(key):
-    if key not in buffer:
-        return "Invalid location", 400
-    
-    item = buffer[key]
-
-    if item["result"] is None:
+    if result is None:
         # TODO: calculate result
-        item["result"] = 1
+        result = "qwertyio"
 
-    return item["result"]
+    return result

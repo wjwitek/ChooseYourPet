@@ -10,6 +10,7 @@ const theme: DefaultTheme = {
     bgDark: "#022744",
     bgLight: "#e1e2e3",
     accent: "#c97c79",
+    disabled: "#808080",
   },
 };
 
