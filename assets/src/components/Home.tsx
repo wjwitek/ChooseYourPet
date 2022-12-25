@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CenteredField, Button } from "./common";
+import { CenteredField, Button, ButtonBox } from "./common";
 import type { Available } from "../types";
 
 const HomeCenteredField = styled(CenteredField)`
@@ -31,18 +31,13 @@ const Text = styled.p`
   text-align: center;
 `;
 
-const ButtonBox = styled.div`
-  display: flex;
-  gap: 2rem;
-`;
-
 const Home = () => {
   const navigate = useNavigate();
   const [available, setAvailable] = useState<Available>({
     criteria: false,
     pets: false,
   });
-  const resultsDisabled = useMemo(() => available.criteria && available.pets, [available]);
+  const resultsDisabled = useMemo(() => !available.criteria || !available.pets, [available]);
 
   useEffect(() => {
     let ignore = false;
@@ -83,7 +78,7 @@ const Home = () => {
         </Button>
         <Button onClick={() => navigate("/compare/pets")}>{available.pets ? "Re-compare pets" : "Compare pets"}</Button>
         <Button
-          disabled={!resultsDisabled}
+          disabled={resultsDisabled}
           onClick={() => {
             if (!resultsDisabled) navigate("/result");
           }}

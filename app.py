@@ -41,7 +41,6 @@ def api_submit_criteria():
     global criteria
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
-    print(data)
 
     # TODO: data validation
     if False:
@@ -57,8 +56,6 @@ def api_submit_pets():
     global pets
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
-    try:
-        
 
     # TODO: data validation
     if False:
@@ -70,9 +67,11 @@ def api_submit_pets():
     return jsonify(), 200
 
 @app.route("/api/result")
-def api_result(key):
-    if result is None:
-        # TODO: calculate result
-        result = "qwertyio"
+def api_result():
+    global result
 
-    return result
+    if result is None:
+        # TODO: calculate the result
+        result = pets_data[:3]
+
+    return {"data": result}

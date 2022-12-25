@@ -68,3 +68,8 @@ export const Name = styled.h1`
   font-size: 3rem;
   text-align: center;
 `;
+
+export const ButtonBox = styled.div`
+  display: flex;
+  gap: 2rem;
+`;
