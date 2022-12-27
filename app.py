@@ -1,21 +1,25 @@
 from flask import Flask, send_from_directory, request, jsonify
 from utils.data import get_criteria, get_pets
+from utils.ahp import AnalyticalHierarchyProcess
 import os
+import sys
 
-criteria = None
 pets = None
 result = None
+criteria = None
 
 criteria_data = get_criteria("./data/categories.csv")
 pets_data = get_pets("./data/pets.csv")
 
 app = Flask(__name__, static_folder="./assets/build")
+ahp = AnalyticalHierarchyProcess(pets_data, criteria_data)
 
 # Hacky way to make Flask catch all the routes and not try to serve static files
 # See https://github.com/pallets/flask/issues/1633
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
 def index(path):
+    print(criteria_data, file=sys.stderr)
     if path != "" and os.path.exists(f"{app.static_folder}/{path}"):
         return send_from_directory(app.static_folder, path)
     else:
@@ -38,14 +42,15 @@ def api_available():
 
 @app.route("/api/submit/criteria", methods=["POST"])
 def api_submit_criteria():
-    global criteria
+    global result, criteria
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    # TODO: data validation
-    if False:
+    if 'data' not in data.keys() or type(data['data']) != list:
         return "Invalid json structure", 400
-    
+
+    ahp.add_criteria_matrix(data['data'])
+
     criteria = data
     result = None
 
@@ -53,14 +58,16 @@ def api_submit_criteria():
 
 @app.route("/api/submit/pets", methods=["POST"])
 def api_submit_pets():
-    global pets
+    global result, pets
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    # TODO: data validation
-    if False:
+    if 'data' not in data.keys() or type(data['data']) != list or len(data['data']) != len(criteria_data):
         return "Invalid json structure", 400
     
+    for i in range(len(data['data'])):
+        ahp.add_pets_matrix(i, data['data'][i])
+
     pets = data
     result = None
 
@@ -71,7 +78,6 @@ def api_result():
     global result
 
     if result is None:
-        # TODO: calculate the result
-        result = pets_data[:3]
+        result = ahp.choose_pet(pets_data)
 
     return {"data": result}
