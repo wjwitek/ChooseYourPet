@@ -1,12 +1,8 @@
-import sys
-
 import numpy as np
 import random
-from typing import Dict, List
-import sys
 
 
-def process_matrix(raw_matrix: List[List]):
+def process_matrix(raw_matrix: list[list]):
     matrix = np.eye(len(raw_matrix))
     for i in range(len(raw_matrix)):
         for j in range(len(raw_matrix[i])):
@@ -33,28 +29,30 @@ def randomize_matrix(n: int) -> np.ndarray:
     return matrix
 
 
-class AnalyticalHierarchyProcess:
-    def __init__(self, pets_data: List[Dict] = None, criteria_data: List[Dict] = None):
-        if criteria_data is None:
-            self.criteria = ["time", "cost", "lifespan"]
-        else:
-            self.criteria = [criteria['name'] for criteria in criteria_data]
+class AnalyticHierarchyProcess:
+    def __init__(self, pets_data: list[dict], criteria_data: list[dict]):
+        self.criteria = [criteria['name'] for criteria in criteria_data]
+        self.pets = [pet['name'] for pet in pets_data]
 
-        if pets_data is None:
-            self.pets = ["cat", "dog", "snake"]
-        else:
-            self.pets = [pet['name'] for pet in pets_data]
+        self.criteria_matrix = None
+        self.pets_matrices = [None for _ in self.criteria]
 
-        self.criteria_matrix = np.ones([len(self.criteria), len(self.criteria)])
-        self.pets_matrices = [np.ones([len(self.pets), len(self.pets)]) for _ in self.criteria]
+    def criteria_set(self) -> bool:
+        return self.criteria_matrix is not None
 
-    def add_pets_matrix(self, criteria: int, raw_matrix: List[List]):
+    def pets_set(self) -> bool:
+        for matrix in self.pets_matrices:
+            if matrix is None:
+                return False
+        return True
+
+    def add_pets_matrix(self, criteria: int, raw_matrix: list[list]):
         self.pets_matrices[criteria] = process_matrix(raw_matrix)
 
-    def add_criteria_matrix(self, raw_matrix: List[List]):
+    def add_criteria_matrix(self, raw_matrix: list[list]):
         self.criteria_matrix = process_matrix(raw_matrix)
 
-    def choose_pet(self, pets_data) -> List:
+    def choose_pet(self, pets_data) -> list:
         criteria_vector = calculate_priority_vector(self.criteria_matrix).astype('float64')
         rank_vector = np.zeros(len(self.pets))
         for i in range(len(self.pets_matrices)):
