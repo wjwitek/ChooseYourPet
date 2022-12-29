@@ -1,15 +1,13 @@
 from flask import Flask, send_from_directory, request, jsonify
 from utils.data import get_criteria, get_pets
+from utils.ahp import AnalyticHierarchyProcess
 import os
-
-criteria = None
-pets = None
-result = None
 
 criteria_data = get_criteria("./data/categories.csv")
 pets_data = get_pets("./data/pets.csv")
 
 app = Flask(__name__, static_folder="./assets/build")
+ahp = AnalyticHierarchyProcess(pets_data, criteria_data)
 
 # Hacky way to make Flask catch all the routes and not try to serve static files
 # See https://github.com/pallets/flask/issues/1633
@@ -32,46 +30,37 @@ def api_pets():
 @app.route("/api/available")
 def api_available():
     return {
-        "criteria": criteria is not None,
-        "pets": pets is not None,
+        "criteria": bool(ahp.criteria_set()),
+        "pets": bool(ahp.pets_set()),
     }
 
 @app.route("/api/submit/criteria", methods=["POST"])
 def api_submit_criteria():
-    global criteria
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    # TODO: data validation
-    if False:
+    if 'data' not in data or type(data['data']) != list:
         return "Invalid json structure", 400
-    
-    criteria = data
-    result = None
+
+    ahp.add_criteria_matrix(data['data'])
 
     return jsonify(), 200
 
 @app.route("/api/submit/pets", methods=["POST"])
 def api_submit_pets():
-    global pets
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    # TODO: data validation
-    if False:
+    if 'data' not in data or type(data['data']) != list or len(data['data']) != len(criteria_data):
         return "Invalid json structure", 400
     
-    pets = data
-    result = None
+    for i in range(len(data['data'])):
+        ahp.add_pets_matrix(i, data['data'][i])
 
     return jsonify(), 200
 
 @app.route("/api/result")
 def api_result():
-    global result
-
-    if result is None:
-        # TODO: calculate the result
-        result = pets_data[:3]
+    result = ahp.choose_pet(pets_data)
 
     return {"data": result}
