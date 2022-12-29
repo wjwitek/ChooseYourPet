@@ -24,8 +24,8 @@ const CompareCriteria = () => {
 
   const addValueToMatrix = useCallback(() => {
     if (curCriterium.col == 0) {
-        criteriaMatrix.current.push([]);
-      }
+      criteriaMatrix.current.push([]);
+    }
     criteriaMatrix.current[curCriterium.row].push(IMPORTANCE_SCALE[pressedDot]);
   }, [curCriterium, pressedDot]);
 
@@ -92,7 +92,7 @@ const CompareCriteria = () => {
           </CriteriaArea>
           <Button
             onClick={() => {
-              addValueToMatrix()
+              addValueToMatrix();
               if (isLastIter) {
                 submitCriteriaMatrix();
               } else {

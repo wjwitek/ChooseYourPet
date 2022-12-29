@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CenteredField, Button, ButtonBox } from "./common";
+import { CenteredField, Button, Header } from "./common";
 import type { Available } from "../types";
 
 const HomeCenteredField = styled(CenteredField)`
-  width: 110rem;
+  width: 100rem;
   height: 45rem;
 `;
 
@@ -16,19 +16,18 @@ const DescriptionContainer = styled.div`
   gap: 2rem;
 `;
 
-const Header = styled.h1`
-  font-family: ${(props) => props.theme.secondaryFont};
-  color: ${(props) => props.theme.colors.fontDark};
-  margin: 0;
-  font-size: 7rem;
-  font-weight: 600;
-`;
-
 const Text = styled.p`
   color: ${(props) => props.theme.colors.fontDark};
   width: 90%;
   margin: 0;
   text-align: center;
+`;
+
+const ButtonBox = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 2.5rem 4rem;
 `;
 
 const Home = () => {
@@ -77,6 +76,7 @@ const Home = () => {
           {available.criteria ? "Re-compare criteria" : "Compare criteria"}
         </Button>
         <Button onClick={() => navigate("/compare/pets")}>{available.pets ? "Re-compare pets" : "Compare pets"}</Button>
+        <Button onClick={() => navigate("/consistency")}>Consistency</Button>
         <Button
           disabled={resultsDisabled}
           onClick={() => {

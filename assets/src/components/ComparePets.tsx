@@ -59,12 +59,12 @@ const ComparePets = () => {
 
   const addValueToMatrix = useCallback(() => {
     if (curPet.row === 1 && curPet.col == 0) {
-        petsMatrices.current.push([[]]);
-      }
-      if (curPet.col === 0) {
-        petsMatrices.current[curPet.criterium].push([]);
-      }
-      petsMatrices.current[curPet.criterium][curPet.row].push(IMPORTANCE_SCALE[pressedDot]);
+      petsMatrices.current.push([[]]);
+    }
+    if (curPet.col === 0) {
+      petsMatrices.current[curPet.criterium].push([]);
+    }
+    petsMatrices.current[curPet.criterium][curPet.row].push(IMPORTANCE_SCALE[pressedDot]);
   }, [curPet, pressedDot]);
 
   const getNextQuestion = useCallback(() => {
@@ -84,7 +84,7 @@ const ComparePets = () => {
   }, [pets]);
 
   const submitPetsMatricies = useCallback(async () => {
-    console.log(petsMatrices)
+    console.log(petsMatrices);
     try {
       await fetch("/api/submit/pets", {
         method: "post",
@@ -105,9 +105,7 @@ const ComparePets = () => {
 
     const fetchData = async (
       url: string,
-      setData:
-        | React.Dispatch<React.SetStateAction<Criterium[] | undefined>>
-        | React.Dispatch<React.SetStateAction<Pet[] | undefined>>
+      setData: ((value: Criterium[] | undefined) => void) | ((value: Pet[] | undefined) => void)
     ) => {
       try {
         const response = await fetch(url);
@@ -149,7 +147,7 @@ const ComparePets = () => {
           </CriteriaArea>
           <Button
             onClick={() => {
-              addValueToMatrix()
+              addValueToMatrix();
               if (isLastIter) {
                 submitPetsMatricies();
               } else {

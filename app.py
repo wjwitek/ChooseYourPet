@@ -34,12 +34,16 @@ def api_available():
         "pets": ahp.is_pets_set(),
     }
 
+@app.route("/api/consistency")
+def api_consistency():
+    return {"data": ahp.get_consistency_indices()}
+
 @app.route("/api/submit/criteria", methods=["POST"])
 def api_submit_criteria():
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    if 'data' not in data or type(data['data']) != list:
+    if "data" not in data or type(data["data"]) != list:
         return "Invalid json structure", 400
 
     ahp.add_criteria_matrix(data['data'])
@@ -51,7 +55,7 @@ def api_submit_pets():
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    if 'data' not in data or type(data['data']) != list or len(data['data']) != len(criteria_data):
+    if "data" not in data or type(data["data"]) != list or len(data["data"]) != len(criteria_data):
         return "Invalid json structure", 400
     
     ahp.add_pets_matrix(data['data'])
@@ -60,6 +64,4 @@ def api_submit_pets():
 
 @app.route("/api/result")
 def api_result():
-    result, consistency_ratio = ahp.choose_pet()
-
-    return {"data": result, "consistency": consistency_ratio}
+    return {"data": ahp.choose_pet()}
