@@ -61,6 +61,6 @@ def api_submit_pets():
 
 @app.route("/api/result")
 def api_result():
-    result = ahp.choose_pet(pets_data)
+    result, consistency_ratio = ahp.choose_pet(pets_data)
 
-    return {"data": result}
+    return {"data": result, "consistency": consistency_ratio}

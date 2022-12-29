@@ -5,7 +5,7 @@ import type { Pet } from "../types";
 
 const ResultCenteredField = styled(CenteredField)`
   width: 120rem;
-  height: 40rem;
+  height: 50rem;
 `;
 
 const ResultField = styled.div`
@@ -16,6 +16,15 @@ const ResultField = styled.div`
   height: 25rem;
   display: flex;
   gap: 3rem;
+`;
+
+const ConsistencyField = styled.div`
+  background-color: ${(props) => props.theme.colors.bgDark};
+  padding: 1rem;
+  border-radius: 25px;
+  width: 100%;
+  height: 7rem;
+  gap: 1rem;
 `;
 
 const Image = styled.img`
@@ -47,6 +56,7 @@ const ResultButton = styled(Button)`
 const Result = () => {
   const [ranking, setRanking] = useState<Pet[]>();
   const [option, setOption] = useState<number>(0);
+  const [consistency, setConsistency] = useState<number>(0)
 
   useEffect(() => {
     let ignore = false;
@@ -57,6 +67,7 @@ const Result = () => {
         const json = await response.json();
         if (!ignore) {
           setRanking(json.data);
+          setConsistency(json.consistency);
         }
       } catch (e) {
         console.error(`Fetching result data failed: ${e}`);
@@ -89,9 +100,14 @@ const Result = () => {
               Second choice
             </ResultButton>
             <ResultButton disabled={option === 2} onClick={() => setOption(2)}>
-              Third choice
+              Third choice aa
             </ResultButton>
           </ButtonBox>
+          <ConsistencyField>
+            <Text>
+              <Description> Consistency ratio: {consistency} </Description>
+            </Text>
+          </ConsistencyField>
         </>
       ) : (
         <Loading>Processing the data...</Loading>

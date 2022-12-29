@@ -2,6 +2,9 @@ import numpy as np
 import random
 
 
+RI_n_9 = {3: 0.546, 4: 0.83, 5: 1.08, 6: 1.26, 7: 1.33, 8: 1.41, 9: 1.45}
+
+
 def process_matrix(raw_matrix: list[list]):
     matrix = np.eye(len(raw_matrix))
     for i in range(len(raw_matrix)):
@@ -11,11 +14,11 @@ def process_matrix(raw_matrix: list[list]):
     return matrix
 
 
-def calculate_priority_vector(matrix: np.ndarray) -> np.ndarray:
+def calculate_priority_vector(matrix: np.ndarray) -> tuple[np.ndarray, float]:
     eigen_values, eigen_vectors = np.linalg.eig(matrix)
     eigen_vector = eigen_vectors[:, 0]  # numpy returns things here weirdly, such that column i corresponds to
     # eigenvalue i
-    return eigen_vector / eigen_vector.sum()
+    return eigen_vector / eigen_vector.sum(), eigen_values.max()
 
 
 def randomize_matrix(n: int) -> np.ndarray:
@@ -36,6 +39,7 @@ class AnalyticHierarchyProcess:
 
         self.criteria_matrix = None
         self.pets_matrices = [None for _ in self.criteria]
+        self.consistency_ratio = None
 
     def criteria_set(self) -> bool:
         return self.criteria_matrix is not None
@@ -52,15 +56,25 @@ class AnalyticHierarchyProcess:
     def add_criteria_matrix(self, raw_matrix: list[list]):
         self.criteria_matrix = process_matrix(raw_matrix)
 
-    def choose_pet(self, pets_data) -> list:
-        criteria_vector = calculate_priority_vector(self.criteria_matrix).astype('float64')
+    def choose_pet(self, pets_data) -> tuple[list, float]:
+        criteria_vector, eigen_value = calculate_priority_vector(self.criteria_matrix)
+        criteria_vector = criteria_vector.astype('float64')
+        self.calculate_consistency(eigen_value)
+
         rank_vector = np.zeros(len(self.pets))
         for i in range(len(self.pets_matrices)):
-            rank_vector += calculate_priority_vector(self.pets_matrices[i]).astype('float64') * criteria_vector[i]
+            pet_criteria_vector, _ = calculate_priority_vector(self.pets_matrices[i])
+            rank_vector += pet_criteria_vector.astype('float64') * criteria_vector[i]
 
         indexes = [i for i in range(len(pets_data))]
 
         result = [x for _, x in sorted(zip(rank_vector, indexes), reverse=True)][:3]
         result = [pets_data[i] for i in result]
 
-        return result
+        return result, self.consistency_ratio
+
+    def calculate_consistency(self, eigen_value: float):
+        n = len(self.pets)
+        ci = (eigen_value - n) / (n - 1)
+
+        self.consistency_ratio = ci / RI_n_9[n]
