@@ -49,7 +49,7 @@ const ComparePets = () => {
     col: 0,
   });
   const [pressedDot, setPressedDot] = useState<number>(DEFAULT_VALUE_INDEX);
-  const petsMatricies = useRef<number[][][]>([]);
+  const petsMatrices = useRef<number[][][]>([]);
   const isLastIter = useMemo(() => {
     if (pets && criteria)
       return (
@@ -57,15 +57,17 @@ const ComparePets = () => {
       );
   }, [criteria, curPet, pets]);
 
-  const getNextQuestion = useCallback(() => {
+  const addValueToMatrix = useCallback(() => {
     if (curPet.row === 1 && curPet.col == 0) {
-      petsMatricies.current.push([[]]);
-    }
-    if (curPet.col === 0) {
-      petsMatricies.current[curPet.criterium].push([]);
-    }
+        petsMatrices.current.push([[]]);
+      }
+      if (curPet.col === 0) {
+        petsMatrices.current[curPet.criterium].push([]);
+      }
+      petsMatrices.current[curPet.criterium][curPet.row].push(IMPORTANCE_SCALE[pressedDot]);
+  }, [curPet, pressedDot]);
 
-    petsMatricies.current[curPet.criterium][curPet.row].push(IMPORTANCE_SCALE[pressedDot]);
+  const getNextQuestion = useCallback(() => {
     setCurPet((prev) => {
       if (pets) {
         if (prev.col + 1 === pets.length - 1 && prev.row === pets.length - 1) {
@@ -79,9 +81,10 @@ const ComparePets = () => {
       return prev;
     });
     setPressedDot(DEFAULT_VALUE_INDEX);
-  }, [curPet, pets, pressedDot]);
+  }, [pets]);
 
   const submitPetsMatricies = useCallback(async () => {
+    console.log(petsMatrices)
     try {
       await fetch("/api/submit/pets", {
         method: "post",
@@ -89,7 +92,7 @@ const ComparePets = () => {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ data: petsMatricies.current }),
+        body: JSON.stringify({ data: petsMatrices.current }),
       });
       navigate("/home");
     } catch (e) {
@@ -146,6 +149,7 @@ const ComparePets = () => {
           </CriteriaArea>
           <Button
             onClick={() => {
+              addValueToMatrix()
               if (isLastIter) {
                 submitPetsMatricies();
               } else {

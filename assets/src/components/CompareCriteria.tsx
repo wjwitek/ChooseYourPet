@@ -22,12 +22,14 @@ const CompareCriteria = () => {
     if (criteria) return curCriterium.col + 1 === criteria.length - 1 && curCriterium.row === criteria.length - 1;
   }, [criteria, curCriterium]);
 
-  const getNextQuestion = useCallback(() => {
+  const addValueToMatrix = useCallback(() => {
     if (curCriterium.col == 0) {
-      criteriaMatrix.current.push([]);
-    }
+        criteriaMatrix.current.push([]);
+      }
     criteriaMatrix.current[curCriterium.row].push(IMPORTANCE_SCALE[pressedDot]);
+  }, [curCriterium, pressedDot]);
 
+  const getNextQuestion = useCallback(() => {
     setCurCriterium((prev) => {
       if (prev.col === prev.row - 1) {
         return { row: prev.row + 1, col: 0 };
@@ -35,7 +37,7 @@ const CompareCriteria = () => {
       return { ...prev, col: prev.col + 1 };
     });
     setPressedDot(DEFAULT_VALUE_INDEX);
-  }, [curCriterium, pressedDot]);
+  }, []);
 
   const submitCriteriaMatrix = useCallback(async () => {
     try {
@@ -90,6 +92,7 @@ const CompareCriteria = () => {
           </CriteriaArea>
           <Button
             onClick={() => {
+              addValueToMatrix()
               if (isLastIter) {
                 submitCriteriaMatrix();
               } else {

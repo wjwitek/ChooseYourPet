@@ -100,7 +100,7 @@ const Result = () => {
               Second choice
             </ResultButton>
             <ResultButton disabled={option === 2} onClick={() => setOption(2)}>
-              Third choice aa
+              Third choice
             </ResultButton>
           </ButtonBox>
           <ConsistencyField>
