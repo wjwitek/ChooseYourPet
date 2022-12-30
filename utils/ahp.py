@@ -19,7 +19,6 @@ def calculate_priority_vector(matrix: np.ndarray) -> tuple[np.ndarray, float]:
 
 def calculate_consistency(matrix: np.ndarray) -> float:
     eigen_values, _ = np.linalg.eig(matrix)
-    # TODO: the eigen values might be complex, need to handle that
 
     n = len(matrix)
     ci = (eigen_values.astype('float64').max() - n) / (n - 1)
@@ -51,7 +50,7 @@ class AnalyticHierarchyProcess:
 
         return {"criteria": criteria_consistency, "pets": pets_consistencies}
 
-    def choose_pet(self) -> tuple[list[float], float]:
+    def choose_pet(self) -> list[dict]:
         if not self.is_criteria_set() or not self.is_pets_set(): return None, None
 
         criteria_vector = calculate_priority_vector(self.criteria_matrix)
