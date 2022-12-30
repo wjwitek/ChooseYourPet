@@ -12,9 +12,9 @@ def process_matrix(raw_matrix: list[list[float]]) -> np.ndarray:
     return matrix
 
 def calculate_priority_vector(matrix: np.ndarray) -> tuple[np.ndarray, float]:
-    _, eigen_vectors = np.linalg.eig(matrix)
+    eigen_values, eigen_vectors = np.linalg.eig(matrix)
     # numpy returns things here weirdly, such that column i corresponds to eigenvalue i
-    eigen_vector = eigen_vectors[:, 0]
+    eigen_vector = eigen_vectors[:, eigen_values.argmax()]
     return eigen_vector / eigen_vector.sum()
 
 def calculate_consistency(matrix: np.ndarray) -> float:
@@ -22,7 +22,7 @@ def calculate_consistency(matrix: np.ndarray) -> float:
     # TODO: the eigen values might be complex, need to handle that
 
     n = len(matrix)
-    ci = (eigen_values.max() - n) / (n - 1)
+    ci = (eigen_values.astype('float64').max() - n) / (n - 1)
     return ci / RI[n]
 
 class AnalyticHierarchyProcess:
@@ -59,7 +59,7 @@ class AnalyticHierarchyProcess:
 
         rank_vector = np.zeros(len(self.pets_data))
         for i in range(len(self.pets_matrices)):
-            pet_criteria_vector, _ = calculate_priority_vector(self.pets_matrices[i])
+            pet_criteria_vector = calculate_priority_vector(self.pets_matrices[i])
             rank_vector += pet_criteria_vector.astype("float64") * criteria_vector[i]
 
         indexes = [i for i in range(len(self.pets_data))]
