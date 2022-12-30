@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Button, ButtonBox, CenteredField, Name } from "./common";
+import { Button, CenteredField, Name } from "./common";
 import type { Pet } from "../types";
 
 const ResultCenteredField = styled(CenteredField)`
@@ -31,6 +31,11 @@ const Text = styled.div`
 const Description = styled.p`
   font-size: 2.5rem;
   text-align: center;
+`;
+
+const ButtonBox = styled.div`
+  display: flex;
+  gap: 2rem;
 `;
 
 const Loading = styled.i`

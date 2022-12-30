@@ -13,3 +13,8 @@ export type Available = {
   criteria: boolean;
   pets: boolean;
 };
+
+export type Consistencies = {
+  criteria: number | null;
+  pets: number[] | null;
+};
