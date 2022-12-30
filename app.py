@@ -7,7 +7,7 @@ criteria_data = get_criteria("./data/categories.csv")
 pets_data = get_pets("./data/pets.csv")
 
 app = Flask(__name__, static_folder="./assets/build")
-ahp = AnalyticHierarchyProcess(pets_data, criteria_data)
+ahp = AnalyticHierarchyProcess(pets_data)
 
 # Hacky way to make Flask catch all the routes and not try to serve static files
 # See https://github.com/pallets/flask/issues/1633
@@ -30,16 +30,20 @@ def api_pets():
 @app.route("/api/available")
 def api_available():
     return {
-        "criteria": bool(ahp.criteria_set()),
-        "pets": bool(ahp.pets_set()),
+        "criteria": ahp.is_criteria_set(),
+        "pets": ahp.is_pets_set(),
     }
+
+@app.route("/api/consistency")
+def api_consistency():
+    return {"data": ahp.get_consistency_indices()}
 
 @app.route("/api/submit/criteria", methods=["POST"])
 def api_submit_criteria():
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    if 'data' not in data or type(data['data']) != list:
+    if "data" not in data or type(data["data"]) != list:
         return "Invalid json structure", 400
 
     ahp.add_criteria_matrix(data['data'])
@@ -51,16 +55,13 @@ def api_submit_pets():
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
-    if 'data' not in data or type(data['data']) != list or len(data['data']) != len(criteria_data):
+    if "data" not in data or type(data["data"]) != list or len(data["data"]) != len(criteria_data):
         return "Invalid json structure", 400
     
-    for i in range(len(data['data'])):
-        ahp.add_pets_matrix(i, data['data'][i])
+    ahp.add_pets_matrix(data['data'])
 
     return jsonify(), 200
 
 @app.route("/api/result")
 def api_result():
-    result, consistency_ratio = ahp.choose_pet(pets_data)
-
-    return {"data": result, "consistency": consistency_ratio}
+    return {"data": ahp.choose_pet()}

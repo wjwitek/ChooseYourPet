@@ -69,7 +69,10 @@ export const Name = styled.h1`
   text-align: center;
 `;
 
-export const ButtonBox = styled.div`
-  display: flex;
-  gap: 2rem;
+export const Header = styled.h1`
+  font-family: ${(props) => props.theme.secondaryFont};
+  color: ${(props) => props.theme.colors.fontDark};
+  margin: 0;
+  font-size: 5rem;
+  font-weight: 600;
 `;
