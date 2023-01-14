@@ -61,7 +61,7 @@ const Home = () => {
 
     const fetchAvailable = async () => {
       try {
-        const response = await fetch("/api/available");
+        const response = await fetch(`/api/available/${currentExpert}`);
         const json = await response.json();
         if (!ignore) {
           // "Unpacking" the json to get error if the structure is invalid
@@ -77,7 +77,7 @@ const Home = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [currentExpert]);
 
   return (
     <HomeCenteredField>
@@ -91,8 +91,11 @@ const Home = () => {
       </DescriptionContainer>
       <ButtonBox>
         <Button
-          disabled={currentExpert === maxExperts || (available.criteria && available.pets)}
-          onClick={() => (maxExperts ? setCurrentExpert((prev) => prev + 1) : navigate("/experts"))}
+          disabled={maxExperts != null && (currentExpert === maxExperts || !(available.criteria && available.pets))}
+          onClick={() => {
+            maxExperts ? setCurrentExpert((prev) => prev + 1) : navigate("/experts");
+            setAvailable({ criteria: false, pets: false });
+          }}
         >
           {maxExperts ? "Next expert" : "Experts"}
         </Button>

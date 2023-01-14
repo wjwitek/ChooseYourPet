@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useExpert } from "../contexts/CurrentExpertContext";
 import { IMPORTANCE_SCALE, DEFAULT_VALUE_INDEX } from "../consts";
 import { CenteredField, Button, CriteriaArea } from "./common";
 import CriteriumBox from "./CriteriumBox";
@@ -18,6 +19,7 @@ const CompareCriteria = () => {
   const [curCriterium, setCurCriterium] = useState<{ row: number; col: number }>({ row: 1, col: 0 });
   const [pressedDot, setPressedDot] = useState<number>(DEFAULT_VALUE_INDEX);
   const criteriaMatrix = useRef<number[][]>([[]]);
+  const { currentExpert } = useExpert();
   const isLastIter = useMemo(() => {
     if (criteria) return curCriterium.col + 1 === criteria.length - 1 && curCriterium.row === criteria.length - 1;
   }, [criteria, curCriterium]);
@@ -41,7 +43,7 @@ const CompareCriteria = () => {
 
   const submitCriteriaMatrix = useCallback(async () => {
     try {
-      await fetch("/api/submit/criteria", {
+      await fetch(`/api/submit/criteria/${currentExpert}`, {
         method: "post",
         headers: {
           Accept: "application/json",
@@ -53,7 +55,7 @@ const CompareCriteria = () => {
     } catch (e) {
       console.error(`Submiting criteria matrix failed: ${e}`);
     }
-  }, [navigate]);
+  }, [navigate, currentExpert]);
 
   useEffect(() => {
     let ignore = false;
