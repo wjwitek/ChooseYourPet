@@ -2,11 +2,12 @@ import styled from "styled-components";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CenteredField, Button, Header } from "./common";
+import { useCurrentExpert } from "../contexts/CurrentExpertContext";
 import type { Available } from "../types";
 
 const HomeCenteredField = styled(CenteredField)`
   width: 100rem;
-  height: 45rem;
+  height: 60rem;
 `;
 
 const DescriptionContainer = styled.div`
@@ -26,8 +27,13 @@ const Text = styled.p`
 const ButtonBox = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 2.5rem 4rem;
+`;
+
+const ResultsButton = styled(Button)`
+  grid-column: span 2;
+  justify-self: center;
 `;
 
 const Home = () => {
@@ -37,6 +43,7 @@ const Home = () => {
     pets: false,
   });
   const resultsDisabled = useMemo(() => !available.criteria || !available.pets, [available]);
+  const { currentExpert } = useCurrentExpert();
 
   useEffect(() => {
     let ignore = false;
@@ -72,19 +79,24 @@ const Home = () => {
         </Text>
       </DescriptionContainer>
       <ButtonBox>
-        <Button onClick={() => navigate("/compare/criteria")}>
+        <Button>Experts</Button>
+        <Button disabled={!currentExpert} onClick={() => navigate("/compare/criteria")}>
           {available.criteria ? "Re-compare criteria" : "Compare criteria"}
         </Button>
-        <Button onClick={() => navigate("/compare/pets")}>{available.pets ? "Re-compare pets" : "Compare pets"}</Button>
-        <Button onClick={() => navigate("/consistency")}>Consistency</Button>
-        <Button
+        <Button disabled={!currentExpert} onClick={() => navigate("/compare/pets")}>
+          {available.pets ? "Re-compare pets" : "Compare pets"}
+        </Button>
+        <Button disabled={!currentExpert} onClick={() => navigate("/consistency")}>
+          Consistency
+        </Button>
+        <ResultsButton
           disabled={resultsDisabled}
           onClick={() => {
             if (!resultsDisabled) navigate("/result");
           }}
         >
           See results
-        </Button>
+        </ResultsButton>
       </ButtonBox>
     </HomeCenteredField>
   );

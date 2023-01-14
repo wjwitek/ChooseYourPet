@@ -7,22 +7,25 @@ import ComparePets from "./ComparePets";
 import Result from "./Result";
 import Home from "./Home";
 import theme from "../theme";
+import { CurrentExpertProvider } from "../contexts/CurrentExpertContext";
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/compare/criteria" element={<CompareCriteria />} />
-          <Route path="/compare/pets" element={<ComparePets />} />
-          <Route path="/result" element={<Result />} />
-          <Route path="/consistency" element={<Consistency />} />
-          <Route path="*" element={<Navigate to="/home" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </ThemeProvider>
+    <CurrentExpertProvider>
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/home" element={<Home />} />
+            <Route path="/compare/criteria" element={<CompareCriteria />} />
+            <Route path="/compare/pets" element={<ComparePets />} />
+            <Route path="/result" element={<Result />} />
+            <Route path="/consistency" element={<Consistency />} />
+            <Route path="*" element={<Navigate to="/home" replace />} />
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    </CurrentExpertProvider>
   );
 };
 
