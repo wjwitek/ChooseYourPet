@@ -2,12 +2,12 @@ import styled from "styled-components";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CenteredField, Button, Header } from "./common";
-import { useCurrentExpert } from "../contexts/CurrentExpertContext";
+import { useExpert } from "../contexts/CurrentExpertContext";
 import type { Available } from "../types";
 
 const HomeCenteredField = styled(CenteredField)`
   width: 100rem;
-  height: 60rem;
+  height: 52rem;
 `;
 
 const DescriptionContainer = styled.div`
@@ -36,6 +36,17 @@ const ResultsButton = styled(Button)`
   justify-self: center;
 `;
 
+const CurrentExpertBox = styled.div`
+  background-color: ${(props) => props.theme.colors.bgDark};
+  color: ${(props) => props.theme.colors.fontLight};
+  border-radius: 25px;
+  padding: 0.5rem 1rem;
+  font-size: 2rem;
+  align-self: flex-start;
+  position: absolute;
+  bottom: 2rem;
+`;
+
 const Home = () => {
   const navigate = useNavigate();
   const [available, setAvailable] = useState<Available>({
@@ -43,7 +54,7 @@ const Home = () => {
     pets: false,
   });
   const resultsDisabled = useMemo(() => !available.criteria || !available.pets, [available]);
-  const { currentExpert } = useCurrentExpert();
+  const { maxExperts, currentExpert, setCurrentExpert } = useExpert();
 
   useEffect(() => {
     let ignore = false;
@@ -79,14 +90,19 @@ const Home = () => {
         </Text>
       </DescriptionContainer>
       <ButtonBox>
-        <Button>Experts</Button>
-        <Button disabled={!currentExpert} onClick={() => navigate("/compare/criteria")}>
+        <Button
+          disabled={currentExpert === maxExperts || (available.criteria && available.pets)}
+          onClick={() => (maxExperts ? setCurrentExpert((prev) => prev + 1) : navigate("/experts"))}
+        >
+          {maxExperts ? "Next expert" : "Experts"}
+        </Button>
+        <Button disabled={!maxExperts} onClick={() => navigate("/compare/criteria")}>
           {available.criteria ? "Re-compare criteria" : "Compare criteria"}
         </Button>
-        <Button disabled={!currentExpert} onClick={() => navigate("/compare/pets")}>
+        <Button disabled={!maxExperts} onClick={() => navigate("/compare/pets")}>
           {available.pets ? "Re-compare pets" : "Compare pets"}
         </Button>
-        <Button disabled={!currentExpert} onClick={() => navigate("/consistency")}>
+        <Button disabled={!maxExperts} onClick={() => navigate("/consistency")}>
           Consistency
         </Button>
         <ResultsButton
@@ -98,6 +114,7 @@ const Home = () => {
           See results
         </ResultsButton>
       </ButtonBox>
+      {maxExperts && <CurrentExpertBox>{`Current expert: ${currentExpert}`}</CurrentExpertBox>}
     </HomeCenteredField>
   );
 };

@@ -1,27 +1,30 @@
 import React, { createContext, useContext, useState } from "react";
 
-export type CurrentExpertContextType = {
-  currentExpert: number | null;
-  setCurrentExpert: React.Dispatch<React.SetStateAction<number | null>>;
+export type ExpertContextType = {
+  currentExpert: number;
+  setCurrentExpert: React.Dispatch<React.SetStateAction<number>>;
+  maxExperts: number | null;
+  setMaxExperts: React.Dispatch<React.SetStateAction<number | null>>;
 };
 
-const CurrentExpertContext = createContext<CurrentExpertContextType | undefined>(undefined);
+const CurrentExpertContext = createContext<ExpertContextType | undefined>(undefined);
 
 type Props = {
   children: React.ReactNode;
 };
 
-export const CurrentExpertProvider = ({ children }: Props) => {
-  const [currentExpert, setCurrentExpert] = useState<number | null>(null);
+export const ExpertContextProvider = ({ children }: Props) => {
+  const [currentExpert, setCurrentExpert] = useState<number>(1);
+  const [maxExperts, setMaxExperts] = useState<number | null>(null);
 
   return (
-    <CurrentExpertContext.Provider value={{ currentExpert, setCurrentExpert }}>
+    <CurrentExpertContext.Provider value={{ currentExpert, setCurrentExpert, maxExperts, setMaxExperts }}>
       {children}
     </CurrentExpertContext.Provider>
   );
 };
 
-export const useCurrentExpert = (): CurrentExpertContextType => {
+export const useExpert = (): ExpertContextType => {
   const context = useContext(CurrentExpertContext);
   if (!context) throw new Error("useCurrentExpert must be used within a CurrentExpertProvider");
   return context;
