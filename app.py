@@ -30,21 +30,20 @@ def api_pets():
 @app.route("/api/experts", methods=["POST"])
 def api_experts():
     data = request.get_json()
-    # TODO data["data"] == number of experts, do sth with it
+    ahp.expert_number = data["data"]
 
     return jsonify(), 200
 
 @app.route("/api/available/<int:id>")
 def api_available(id):
-    # TODO must return available of specific expert with id
     return {
-        "criteria": ahp.is_criteria_set(),
-        "pets": ahp.is_pets_set(),
+        "criteria": ahp.is_criteria_set(id),
+        "pets": ahp.is_pets_set(id),
     }
 
 @app.route("/api/consistency/<int:id>")
 def api_consistency(id):
-    return {"data": ahp.get_consistency_indices()}
+    return {"data": ahp.get_consistency_indices(id)}
 
 @app.route("/api/submit/criteria/<int:id>", methods=["POST"])
 def api_submit_criteria(id):
@@ -54,8 +53,7 @@ def api_submit_criteria(id):
     if "data" not in data or type(data["data"]) != list:
         return "Invalid json structure", 400
 
-    # TODO submit to specific expert with id
-    ahp.add_criteria_matrix(data['data'])
+    ahp.add_criteria_matrix(data['data'], id)
 
     return jsonify(), 200
 
@@ -66,9 +64,8 @@ def api_submit_pets(id):
 
     if "data" not in data or type(data["data"]) != list or len(data["data"]) != len(criteria_data):
         return "Invalid json structure", 400
-    
-    # TODO submit to specific expert with id
-    ahp.add_pets_matrix(data['data'])
+
+    ahp.add_pets_matrix(data['data'], id)
 
     return jsonify(), 200
 
