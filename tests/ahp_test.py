@@ -25,10 +25,17 @@ class TestHelperFunctions(unittest.TestCase):
 
         self.assertTrue(np.array_equal(process_matrix(raw_matrix), processed_matrix))
 
-    def test_calculate_priority_vector(self):
+    def test_calculate_priority_vector_evm(self):
         input_matrix = np.asarray([[1, 2, 3], [1 / 2, 1, 4], [1 / 3, 1 / 4, 1]])
         priority_vector = np.asarray([0.517, 0.358, 0.124])
-        calculated_vector = calculate_priority_vector(input_matrix)
+        calculated_vector = calculate_priority_vector_evm(input_matrix)
+
+        self.assertTrue(np.allclose(priority_vector, calculated_vector, rtol=1e-02))
+
+    def test_calculate_priority_vector_gmm(self):
+        input_matrix = np.asarray([[1, 2, 3], [1 / 2, 1, 4], [1 / 3, 1 / 4, 1]])
+        priority_vector = np.asarray([0.517, 0.358, 0.124])
+        calculated_vector = calculate_priority_vector_gmm(input_matrix)
 
         self.assertTrue(np.allclose(priority_vector, calculated_vector, rtol=1e-02))
 
@@ -44,11 +51,12 @@ class TestAHPMethods(unittest.TestCase):
         super(TestAHPMethods, self).__init__(*args, **kwargs)
         pets_data = get_pets("../data/pets.csv")
         self.ahp = AnalyticHierarchyProcess(pets_data)
-        self.ahp.add_criteria_matrix(np.load("data/criteria.npy").tolist())
-        self.ahp.add_pets_matrix(np.load("data/pets.npy").tolist())
+        self.ahp.add_criteria_matrix(np.load("data/criteria.npy").tolist(), expert_id=1)
+        self.ahp.add_pets_matrix(np.load("data/pets.npy").tolist(), expert_id=1)
+        self.ahp.expert_number = 1
 
     def test_choose_pet(self):
-        pets = self.ahp.choose_pet()
+        pets = self.ahp.choose_pet("evm")
 
         self.assertTrue(pets[0]["name"], "Dog")
         self.assertTrue(pets[1]["name"], "Cat")
@@ -57,7 +65,7 @@ class TestAHPMethods(unittest.TestCase):
     def test_consistency_indices(self):
         criteria = 1.125
         pets = [0.612, 2.318, 1.129, 2.395, 0.441, 0.876, 1.006]
-        json = self.ahp.get_consistency_indices()
+        json = self.ahp.get_consistency_indices(expert_id=1)
 
         self.assertAlmostEqual(criteria, json['criteria'], places=2)
         self.assertTrue(np.allclose(pets, json['pets'],  rtol=1e-02))
