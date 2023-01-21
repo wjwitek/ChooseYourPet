@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
+import { useExpert } from "../contexts/CurrentExpertContext";
 import { DEFAULT_VALUE_INDEX, IMPORTANCE_SCALE } from "../consts";
 import { CenteredField, Button, CriteriaArea } from "./common";
 import PetBox from "./PetBox";
@@ -50,6 +51,7 @@ const ComparePets = () => {
   });
   const [pressedDot, setPressedDot] = useState<number>(DEFAULT_VALUE_INDEX);
   const petsMatrices = useRef<number[][][]>([]);
+  const { currentExpert } = useExpert();
   const isLastIter = useMemo(() => {
     if (pets && criteria)
       return (
@@ -86,7 +88,7 @@ const ComparePets = () => {
   const submitPetsMatricies = useCallback(async () => {
     console.log(petsMatrices);
     try {
-      await fetch("/api/submit/pets", {
+      await fetch(`/api/submit/pets/${currentExpert}`, {
         method: "post",
         headers: {
           Accept: "application/json",
@@ -98,7 +100,7 @@ const ComparePets = () => {
     } catch (e) {
       console.error(`Submiting pets matrcies failed: ${e}`);
     }
-  }, [navigate]);
+  }, [navigate, currentExpert]);
 
   useEffect(() => {
     let ignore = false;

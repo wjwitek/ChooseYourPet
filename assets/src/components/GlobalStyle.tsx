@@ -9,7 +9,7 @@ const GlobalStyle = createGlobalStyle`
     font-size: 10px;
     font-family: ${(props) => props.theme.mainFont}, sans-serif;
     background-image: url(${(props) => props.theme.backgroundImage});
-    background-color: #FFFFFF;
+    background-color: ${(props) => props.theme.colors.bgDark};
   }
 `;
 

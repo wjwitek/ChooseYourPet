@@ -28,37 +28,56 @@ class AnalyticHierarchyProcess:
     def __init__(self, pets_data: list[dict[str, str]]):
         self.pets_data = pets_data
 
-        self.criteria_matrix = None
-        self.pets_matrices = None
+        self.criteria_matrix = {}
+        self.pets_matrices = {}
         self.consistency_ratio = None
+        self.expert_number = None
 
-    def is_criteria_set(self) -> bool:
-        return self.criteria_matrix is not None
+    def is_criteria_set(self, expert_id: int) -> bool:
+        return self.criteria_matrix[expert_id] is not None
 
-    def is_pets_set(self) -> bool:
-        return self.pets_matrices is not None
+    def is_pets_set(self, expert_id: int) -> bool:
+        return self.pets_matrices[expert_id] is not None
 
-    def add_pets_matrix(self, raw_matrices: list[list[list[float]]]):
-        self.pets_matrices = [process_matrix(raw) for raw in raw_matrices]
+    def is_ready(self) -> bool:
+        if len(self.criteria_matrix.keys()) != self.expert_number:
+            return False
+        if len(self.pets_matrices.keys()) != self.expert_number:
+            return False
 
-    def add_criteria_matrix(self, raw_matrix: list[list]):
-        self.criteria_matrix = process_matrix(raw_matrix)
+        for key in self.criteria_matrix:
+            if not self.is_criteria_set(key):
+                return False
 
-    def get_consistency_indices(self):
-        criteria_consistency = None if not self.is_criteria_set() else calculate_consistency(self.criteria_matrix)
-        pets_consistencies = None if not self.is_pets_set() else [calculate_consistency(matrix) for matrix in self.pets_matrices]
+        for key in self.pets_matrices:
+            if not self.is_pets_set(key):
+                return False
+
+        return True
+
+    def add_pets_matrix(self, raw_matrices: list[list[list[float]]], expert_id: int):
+        self.pets_matrices[expert_id] = [process_matrix(raw) for raw in raw_matrices]
+
+    def add_criteria_matrix(self, raw_matrix: list[list], expert_id: int):
+        self.criteria_matrix[expert_id] = process_matrix(raw_matrix)
+
+    def get_consistency_indices(self, expert_id):
+        criteria_consistency = None if not self.is_criteria_set(expert_id) \
+            else calculate_consistency(self.criteria_matrix[expert_id])
+        pets_consistencies = None if not self.is_pets_set(expert_id)\
+            else [calculate_consistency(matrix) for matrix in self.pets_matrices[expert_id]]
 
         return {"criteria": criteria_consistency, "pets": pets_consistencies}
 
     def choose_pet(self) -> list[dict]:
-        if not self.is_criteria_set() or not self.is_pets_set(): return None, None
+        if not self.is_ready(): return None, None
 
-        criteria_vector = calculate_priority_vector(self.criteria_matrix)
+        criteria_vector = calculate_priority_vector(self.criteria_matrix[1])
         criteria_vector = criteria_vector.astype("float64")
 
         rank_vector = np.zeros(len(self.pets_data))
         for i in range(len(self.pets_matrices)):
-            pet_criteria_vector = calculate_priority_vector(self.pets_matrices[i])
+            pet_criteria_vector = calculate_priority_vector(self.pets_matrices[1][i])
             rank_vector += pet_criteria_vector.astype("float64") * criteria_vector[i]
 
         indexes = [i for i in range(len(self.pets_data))]

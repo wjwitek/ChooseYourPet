@@ -27,38 +27,45 @@ def api_criteria():
 def api_pets():
     return {"data": pets_data}
 
-@app.route("/api/available")
-def api_available():
+@app.route("/api/experts", methods=["POST"])
+def api_experts():
+    data = request.get_json()
+    ahp.expert_number = data["data"]
+
+    return jsonify(), 200
+
+@app.route("/api/available/<int:id>")
+def api_available(id):
     return {
-        "criteria": ahp.is_criteria_set(),
-        "pets": ahp.is_pets_set(),
+        "criteria": ahp.is_criteria_set(id),
+        "pets": ahp.is_pets_set(id),
     }
 
-@app.route("/api/consistency")
-def api_consistency():
-    return {"data": ahp.get_consistency_indices()}
+@app.route("/api/consistency/<int:id>")
+def api_consistency(id):
+    return {"data": ahp.get_consistency_indices(id)}
 
-@app.route("/api/submit/criteria", methods=["POST"])
-def api_submit_criteria():
+@app.route("/api/submit/criteria/<int:id>", methods=["POST"])
+def api_submit_criteria(id):
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
     if "data" not in data or type(data["data"]) != list:
         return "Invalid json structure", 400
 
-    ahp.add_criteria_matrix(data['data'])
+    ahp.add_criteria_matrix(data['data'], id)
 
     return jsonify(), 200
 
-@app.route("/api/submit/pets", methods=["POST"])
-def api_submit_pets():
+@app.route("/api/submit/pets/<int:id>", methods=["POST"])
+def api_submit_pets(id):
     # Raises 400 error if th request body is not a valid json
     data = request.get_json()
 
     if "data" not in data or type(data["data"]) != list or len(data["data"]) != len(criteria_data):
         return "Invalid json structure", 400
-    
-    ahp.add_pets_matrix(data['data'])
+
+    ahp.add_pets_matrix(data['data'], id)
 
     return jsonify(), 200
 

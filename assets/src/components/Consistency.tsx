@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import { useExpert } from "../contexts/CurrentExpertContext";
 import { CenteredField, Header } from "./common";
 import type { Consistencies, Criterium } from "../types";
 
@@ -34,6 +35,7 @@ const ConsistencyBox = styled.div`
 const Consistency = () => {
   const [criteria, setCriteria] = useState<Criterium[]>();
   const [consistency, setConsistency] = useState<Consistencies>({ criteria: null, pets: null });
+  const { currentExpert } = useExpert();
 
   useEffect(() => {
     let ignore = false;
@@ -55,12 +57,12 @@ const Consistency = () => {
     };
 
     fetchData("/api/data/criteria", setCriteria);
-    fetchData("/api/consistency", setConsistency);
+    fetchData(`/api/consistency/${currentExpert}`, setConsistency);
 
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [currentExpert]);
 
   return (
     <ConsistencyCenteredField>

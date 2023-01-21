@@ -76,3 +76,9 @@ export const Header = styled.h1`
   font-size: 5rem;
   font-weight: 600;
 `;
+
+export const SignButton = styled(Button)`
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+`;
