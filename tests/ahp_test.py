@@ -65,7 +65,7 @@ class TestAHPMethods(unittest.TestCase):
     def test_consistency_indices(self):
         criteria = 1.125
         pets = [0.612, 2.318, 1.129, 2.395, 0.441, 0.876, 1.006]
-        json = self.ahp.get_consistency_indices()
+        json = self.ahp.get_consistency_indices(expert_id=1)
 
         self.assertAlmostEqual(criteria, json['criteria'], places=2)
         self.assertTrue(np.allclose(pets, json['pets'],  rtol=1e-02))
