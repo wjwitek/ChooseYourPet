@@ -39,7 +39,7 @@ class AnalyticHierarchyProcess:
         self.pets_matrices = {}
         self.consistency_ratio = None
         self.expert_number = None
-        self.method = calculate_priority_vector_gmm
+        self.method = None
 
     def is_criteria_set(self, expert_id: int) -> bool:
         return expert_id in self.criteria_matrix.keys() and self.criteria_matrix[expert_id] is not None
@@ -88,8 +88,13 @@ class AnalyticHierarchyProcess:
 
         return rank_vector
 
-    def choose_pet(self) -> list[dict]:
+    def choose_pet(self, method: str) -> list[dict]:
         if not self.is_ready(): return None, None
+
+        if method == "evm":
+            self.method = calculate_priority_vector_evm
+        else:
+            self.method = calculate_priority_vector_gmm
 
         rank_vectors = []
 
