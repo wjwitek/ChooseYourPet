@@ -1,5 +1,5 @@
 import numpy as np
-import sys
+from functools import partial
 
 RI = {3: 0.546, 4: 0.83, 5: 1.08, 6: 1.26, 7: 1.33, 8: 1.41, 9: 1.45}
 
@@ -11,11 +11,16 @@ def process_matrix(raw_matrix: list[list[float]]) -> np.ndarray:
             matrix[j,i] = 1 / raw_matrix[i][j]
     return matrix
 
-def calculate_priority_vector(matrix: np.ndarray) -> tuple[np.ndarray, float]:
+def calculate_priority_vector_evm(matrix: np.ndarray) -> np.ndarray:
     eigen_values, eigen_vectors = np.linalg.eig(matrix)
     # numpy returns things here weirdly, such that column i corresponds to eigenvalue i
     eigen_vector = eigen_vectors[:, eigen_values.argmax()]
     return eigen_vector / eigen_vector.sum()
+
+def calculate_priority_vector_gmm(matrix: np.ndarray) -> np.ndarray:
+    means = [geo_mean(row) for row in matrix]
+    means_sum = sum(means)
+    return np.asarray([mean / means_sum for mean in means])
 
 def calculate_consistency(matrix: np.ndarray) -> float:
     eigen_values, _ = np.linalg.eig(matrix)
@@ -35,6 +40,7 @@ class AnalyticHierarchyProcess:
         self.pets_matrices = {}
         self.consistency_ratio = None
         self.expert_number = None
+        self.method = partial(calculate_priority_vector_gmm)
 
     def is_criteria_set(self, expert_id: int) -> bool:
         return expert_id in self.criteria_matrix.keys() and self.criteria_matrix[expert_id] is not None
@@ -73,12 +79,12 @@ class AnalyticHierarchyProcess:
         return {"criteria": criteria_consistency, "pets": pets_consistencies}
 
     def calculate_rank_vector(self, expert_id) -> np.ndarray:
-        criteria_vector = calculate_priority_vector(self.criteria_matrix[expert_id])
+        criteria_vector = self.method(self.criteria_matrix[expert_id])
         criteria_vector = criteria_vector.astype("float64")
 
         rank_vector = np.zeros(len(self.pets_data))
         for i in range(len(self.pets_matrices)):
-            pet_criteria_vector = calculate_priority_vector(self.pets_matrices[expert_id][i])
+            pet_criteria_vector = self.method(self.pets_matrices[expert_id][i])
             rank_vector += pet_criteria_vector.astype("float64") * criteria_vector[i]
 
         return rank_vector
