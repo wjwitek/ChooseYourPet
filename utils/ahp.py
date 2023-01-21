@@ -1,5 +1,4 @@
 import numpy as np
-from functools import partial
 
 RI = {3: 0.546, 4: 0.83, 5: 1.08, 6: 1.26, 7: 1.33, 8: 1.41, 9: 1.45}
 
@@ -40,7 +39,7 @@ class AnalyticHierarchyProcess:
         self.pets_matrices = {}
         self.consistency_ratio = None
         self.expert_number = None
-        self.method = partial(calculate_priority_vector_gmm)
+        self.method = calculate_priority_vector_gmm
 
     def is_criteria_set(self, expert_id: int) -> bool:
         return expert_id in self.criteria_matrix.keys() and self.criteria_matrix[expert_id] is not None
