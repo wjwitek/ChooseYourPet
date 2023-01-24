@@ -5,7 +5,7 @@ import type { Pet } from "../types";
 
 const ResultCenteredField = styled(CenteredField)`
   width: 120rem;
-  height: 40rem;
+  height: 55rem;
 `;
 
 const ResultField = styled.div`
@@ -50,7 +50,8 @@ const ResultButton = styled(Button)`
 `;
 
 const Result = () => {
-  const [ranking, setRanking] = useState<Pet[]>();
+  const [ranking, setRanking] = useState<{ evm: Pet[] | null; gmm: Pet[] | null }>({ evm: null, gmm: null });
+  const [method, setMethod] = useState<"evm" | "gmm">("evm");
   const [option, setOption] = useState<number>(0);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const Result = () => {
         const response = await fetch("/api/result");
         const json = await response.json();
         if (!ignore) {
-          setRanking(json.data);
+          setRanking({ evm: json.data.evm, gmm: json.data.gmm });
         }
       } catch (e) {
         console.error(`Fetching result data failed: ${e}`);
@@ -77,13 +78,21 @@ const Result = () => {
 
   return (
     <ResultCenteredField>
-      {ranking ? (
+      <ButtonBox>
+        <ResultButton disabled={method === "evm"} onClick={() => setMethod("evm")}>
+          EVM
+        </ResultButton>
+        <ResultButton disabled={method === "gmm"} onClick={() => setMethod("gmm")}>
+          GMM
+        </ResultButton>
+      </ButtonBox>
+      {ranking.evm && ranking.gmm ? (
         <>
           <ResultField>
-            <Image src={ranking[option].pictureUrl} alt={ranking[option].name} />
+            <Image src={ranking[method]![option].pictureUrl} alt={ranking[method]![option].name} />
             <Text>
-              <Name>{ranking[option].name}</Name>
-              <Description>{ranking[option].description}</Description>
+              <Name>{ranking[method]![option].name}</Name>
+              <Description>{ranking[method]![option].description}</Description>
             </Text>
           </ResultField>
           <ButtonBox>
