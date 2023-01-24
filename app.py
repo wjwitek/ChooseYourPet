@@ -71,4 +71,4 @@ def api_submit_pets(id):
 
 @app.route("/api/result")
 def api_result():
-    return {"data": ahp.choose_pet("evm")}
+    return {"data": {"evm": ahp.choose_pet("evm"), "gmm": ahp.choose_pet("gmm")}}
